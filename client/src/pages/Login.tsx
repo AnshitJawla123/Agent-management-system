@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Container, TextField, Typography, Paper } from '@mui/material';
 import { login } from '../services/api';
+import axios, { AxiosError } from 'axios';
+
+interface LoginError {
+  error: string;
+}
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -11,12 +16,25 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(''); // Clear previous errors
+    
     try {
+      if (!email || !password) {
+        setError('Please fill in all fields');
+        return;
+      }
+
       const response = await login(email, password);
       localStorage.setItem('token', response.token);
       navigate('/dashboard');
-    } catch (err) {
-      setError('Invalid credentials');
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError<LoginError>;
+        const errorMessage = axiosError.response?.data?.error || 'Login failed. Please try again.';
+        setError(errorMessage);
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     }
   };
 
@@ -46,6 +64,7 @@ const Login: React.FC = () => {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              error={!!error}
             />
             <TextField
               margin="normal"
@@ -58,6 +77,7 @@ const Login: React.FC = () => {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              error={!!error}
             />
             {error && (
               <Typography color="error" align="center" sx={{ mt: 2 }}>
