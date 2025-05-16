@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Container,
@@ -19,6 +19,7 @@ import {
   Alert,
   CircularProgress,
   Snackbar,
+  AlertColor
 } from '@mui/material';
 import { createAgent, getAllAgents, uploadCSV } from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -47,13 +48,18 @@ interface ServerError {
   error: string;
 }
 
+interface AlertMessage {
+  message: string;
+  severity: AlertColor;
+}
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [alertState, setAlertState] = useState<AlertMessage | null>(null);
   const [newAgent, setNewAgent] = useState<NewAgent>({
     name: '',
     email: '',
@@ -62,9 +68,31 @@ const Dashboard: React.FC = () => {
   });
   const [formErrors, setFormErrors] = useState<Partial<NewAgent>>({});
 
+  const fetchAgents = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getAllAgents();
+      setAgents(data);
+      setError(null);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.status === 401) {
+          localStorage.removeItem('token');
+          navigate('/login');
+        }
+        const serverError = error.response.data as ServerError;
+        setError(serverError.error || 'Failed to fetch agents');
+      } else {
+        setError('An unexpected error occurred while fetching agents');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
+
   useEffect(() => {
     fetchAgents();
-  }, []);
+  }, [fetchAgents]);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -113,28 +141,6 @@ const Dashboard: React.FC = () => {
     return isValid;
   };
 
-  const fetchAgents = async () => {
-    try {
-      setLoading(true);
-      const data = await getAllAgents();
-      setAgents(data);
-      setError(null);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response) {
-        if (error.response.status === 401) {
-          localStorage.removeItem('token');
-          navigate('/login');
-        }
-        const serverError = error.response.data as ServerError;
-        setError(serverError.error || 'Failed to fetch agents');
-      } else {
-        setError('An unexpected error occurred while fetching agents');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleCreateAgent = async () => {
     if (!validateForm()) {
       return;
@@ -150,7 +156,10 @@ const Dashboard: React.FC = () => {
         password: '',
       });
       setFormErrors({});
-      setSuccessMessage('Agent created successfully');
+      setAlertState({
+        message: 'Agent created successfully',
+        severity: 'success'
+      });
       await fetchAgents();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -180,7 +189,10 @@ const Dashboard: React.FC = () => {
 
     try {
       await uploadCSV(file);
-      setSuccessMessage('Tasks distributed successfully');
+      setAlertState({
+        message: 'Tasks distributed successfully',
+        severity: 'success'
+      });
       await fetchAgents();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -199,6 +211,10 @@ const Dashboard: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
+  };
+
+  const handleCloseAlert = () => {
+    setAlertState(null);
   };
 
   if (loading) {
@@ -362,13 +378,21 @@ const Dashboard: React.FC = () => {
       </Dialog>
 
       <Snackbar
-        open={!!successMessage}
+        open={!!alertState}
         autoHideDuration={6000}
-        onClose={() => setSuccessMessage(null)}
-        message={successMessage}
-      />
+        onClose={handleCloseAlert}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseAlert}
+          severity={alertState?.severity || 'info'}
+          sx={{ width: '100%' }}
+        >
+          {alertState?.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
