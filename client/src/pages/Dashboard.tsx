@@ -19,11 +19,13 @@ import {
   Alert,
   CircularProgress,
   Snackbar,
-  AlertColor
+  AlertColor,
+  IconButton
 } from '@mui/material';
 import { createAgent, getAllAgents, uploadCSV } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import '../App.css'; // Import App CSS
 
 interface Agent {
   _id: string;
@@ -219,85 +221,139 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
+      <Container sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        backgroundColor: 'var(--background-light)'
+      }}>
+        <CircularProgress sx={{ color: 'var(--primary-color)' }} />
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-        <Typography variant="h4" component="h1">
-          Agent Management Dashboard
-        </Typography>
-        <Box>
-          <Button
-            variant="contained"
-            component="label"
-            sx={{ mr: 2 }}
-          >
-            Upload CSV
-            <input
-              type="file"
-              hidden
-              accept=".csv,.xlsx,.xls"
-              onChange={handleFileUpload}
-            />
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => setOpenDialog(true)}
-            sx={{ mr: 2 }}
-          >
-            Add Agent
-          </Button>
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }} className="app-container">
+      <Box className="main-content">
+        <Box className="dashboard-header">
+          <Typography variant="h4" component="h1" className="dashboard-heading">
+            Agent Management Dashboard
+          </Typography>
+          <Box className="dashboard-actions">
+            <Button
+              variant="contained"
+              component="label"
+              sx={{ 
+                backgroundColor: 'var(--primary-color)',
+                '&:hover': {
+                  backgroundColor: 'var(--primary-dark)',
+                }
+              }}
+              className="btn btn-primary"
+            >
+              Upload CSV
+              <input
+                type="file"
+                hidden
+                accept=".csv,.xlsx,.xls"
+                onChange={handleFileUpload}
+              />
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => setOpenDialog(true)}
+              sx={{ 
+                backgroundColor: 'var(--secondary-color)',
+                '&:hover': {
+                  backgroundColor: '#d81b60',
+                }
+              }}
+              className="btn btn-secondary"
+            >
+              Add Agent
+            </Button>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleLogout}
+              sx={{
+                borderColor: 'var(--error-color)',
+                color: 'var(--error-color)',
+                '&:hover': {
+                  backgroundColor: 'rgba(244, 67, 54, 0.04)',
+                  borderColor: '#d32f2f'
+                }
+              }}
+            >
+              Logout
+            </Button>
+          </Box>
         </Box>
-      </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
+        {error && (
+          <Box className="alert alert-error" sx={{ mb: 3 }}>
+            {error}
+            <IconButton 
+              size="small" 
+              aria-label="close" 
+              onClick={() => setError(null)}
+              sx={{ ml: 2, padding: '4px' }}
+            >
+              ✕
+            </IconButton>
+          </Box>
+        )}
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Mobile Number</TableCell>
-              <TableCell>Assigned Tasks</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {agents.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} align="center">
-                  No agents found
-                </TableCell>
-              </TableRow>
-            ) : (
-              agents.map((agent) => (
-                <TableRow key={agent._id}>
-                  <TableCell>{agent.name}</TableCell>
-                  <TableCell>{agent.email}</TableCell>
-                  <TableCell>{agent.mobileNumber}</TableCell>
-                  <TableCell>{agent.assignedTasks.length}</TableCell>
+        <Paper className="paper" elevation={0}>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Mobile Number</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Assigned Tasks</TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              </TableHead>
+              <TableBody>
+                {agents.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
+                      <Typography variant="body1" color="text.secondary">
+                        No agents found
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  agents.map((agent) => (
+                    <TableRow key={agent._id} hover>
+                      <TableCell>{agent.name}</TableCell>
+                      <TableCell>{agent.email}</TableCell>
+                      <TableCell>{agent.mobileNumber}</TableCell>
+                      <TableCell>
+                        <Box sx={{ 
+                          display: 'inline-block',
+                          backgroundColor: 'var(--primary-light)',
+                          color: 'white',
+                          padding: '4px 8px',
+                          borderRadius: '12px',
+                          fontWeight: 500,
+                          fontSize: '0.85rem',
+                          minWidth: '24px',
+                          textAlign: 'center'
+                        }}>
+                          {agent.assignedTasks.length}
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+      </Box>
 
       <Dialog 
         open={openDialog} 
@@ -311,54 +367,80 @@ const Dashboard: React.FC = () => {
             password: '',
           });
         }}
+        PaperProps={{
+          sx: {
+            borderRadius: '8px',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)'
+          }
+        }}
       >
-        <DialogTitle>Add New Agent</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Name"
-            fullWidth
-            required
-            value={newAgent.name}
-            onChange={(e) => setNewAgent({ ...newAgent, name: e.target.value })}
-            error={!!formErrors.name}
-            helperText={formErrors.name}
-          />
-          <TextField
-            margin="dense"
-            label="Email"
-            type="email"
-            fullWidth
-            required
-            value={newAgent.email}
-            onChange={(e) => setNewAgent({ ...newAgent, email: e.target.value })}
-            error={!!formErrors.email}
-            helperText={formErrors.email}
-          />
-          <TextField
-            margin="dense"
-            label="Mobile Number"
-            fullWidth
-            required
-            value={newAgent.mobileNumber}
-            onChange={(e) => setNewAgent({ ...newAgent, mobileNumber: e.target.value })}
-            error={!!formErrors.mobileNumber}
-            helperText={formErrors.mobileNumber}
-          />
-          <TextField
-            margin="dense"
-            label="Password"
-            type="password"
-            fullWidth
-            required
-            value={newAgent.password}
-            onChange={(e) => setNewAgent({ ...newAgent, password: e.target.value })}
-            error={!!formErrors.password}
-            helperText={formErrors.password}
-          />
+        <DialogTitle sx={{ 
+          color: 'var(--primary-color)',
+          fontWeight: 600,
+          fontSize: '1.25rem',
+          borderBottom: '1px solid var(--border-color)',
+          padding: '16px 24px'
+        }}>
+          Add New Agent
+        </DialogTitle>
+        <DialogContent sx={{ padding: '24px' }}>
+          <Box className="form-container">
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Name"
+              fullWidth
+              required
+              value={newAgent.name}
+              onChange={(e) => setNewAgent({ ...newAgent, name: e.target.value })}
+              error={!!formErrors.name}
+              helperText={formErrors.name}
+              className="form-input"
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="dense"
+              label="Email"
+              type="email"
+              fullWidth
+              required
+              value={newAgent.email}
+              onChange={(e) => setNewAgent({ ...newAgent, email: e.target.value })}
+              error={!!formErrors.email}
+              helperText={formErrors.email}
+              className="form-input"
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="dense"
+              label="Mobile Number"
+              fullWidth
+              required
+              value={newAgent.mobileNumber}
+              onChange={(e) => setNewAgent({ ...newAgent, mobileNumber: e.target.value })}
+              error={!!formErrors.mobileNumber}
+              helperText={formErrors.mobileNumber}
+              className="form-input"
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="dense"
+              label="Password"
+              type="password"
+              fullWidth
+              required
+              value={newAgent.password}
+              onChange={(e) => setNewAgent({ ...newAgent, password: e.target.value })}
+              error={!!formErrors.password}
+              helperText={formErrors.password}
+              className="form-input"
+            />
+          </Box>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ 
+          padding: '16px 24px',
+          borderTop: '1px solid var(--border-color)'
+        }}>
           <Button 
             onClick={() => {
               setOpenDialog(false);
@@ -370,10 +452,28 @@ const Dashboard: React.FC = () => {
                 password: '',
               });
             }}
+            sx={{ 
+              color: 'var(--text-secondary)',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.04)'
+              }
+            }}
           >
             Cancel
           </Button>
-          <Button onClick={handleCreateAgent}>Create</Button>
+          <Button 
+            onClick={handleCreateAgent}
+            sx={{ 
+              backgroundColor: 'var(--primary-color)',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'var(--primary-dark)'
+              }
+            }}
+            className="btn btn-primary"
+          >
+            Create
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -386,7 +486,11 @@ const Dashboard: React.FC = () => {
         <Alert
           onClose={handleCloseAlert}
           severity={alertState?.severity || 'info'}
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+            borderRadius: '4px' 
+          }}
         >
           {alertState?.message}
         </Alert>

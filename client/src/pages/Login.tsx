@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Button, Container, TextField, Typography, Paper } from '@mui/material';
 import { login } from '../services/api';
 import axios, { AxiosError } from 'axios';
+import '../App.css'; // Import the app CSS
 
 interface LoginError {
   error: string;
@@ -39,20 +40,41 @@ const Login: React.FC = () => {
   };
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="xs" className="app-container">
       <Box
         sx={{
           marginTop: 8,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          minHeight: '100vh',
+          justifyContent: 'center',
         }}
       >
-        <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
-          <Typography component="h1" variant="h5" align="center" gutterBottom>
+        <Paper 
+          elevation={3} 
+          sx={{ 
+            p: 4, 
+            width: '100%',
+            borderRadius: '8px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+          }}
+          className="paper"
+        >
+          <Typography 
+            component="h1" 
+            variant="h5" 
+            align="center" 
+            gutterBottom
+            sx={{ 
+              color: 'var(--primary-color)',
+              fontWeight: 600,
+              marginBottom: '1.5rem' 
+            }}
+          >
             Admin Login
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }} className="form-container">
             <TextField
               margin="normal"
               required
@@ -65,6 +87,15 @@ const Login: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               error={!!error}
+              sx={{
+                marginBottom: '1.25rem',
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': {
+                    borderColor: 'var(--primary-color)',
+                  },
+                },
+              }}
+              className="form-input"
             />
             <TextField
               margin="normal"
@@ -78,17 +109,38 @@ const Login: React.FC = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               error={!!error}
+              sx={{
+                marginBottom: '1.25rem',
+                '& .MuiOutlinedInput-root': {
+                  '&:hover fieldset': {
+                    borderColor: 'var(--primary-color)',
+                  },
+                },
+              }}
+              className="form-input"
             />
             {error && (
-              <Typography color="error" align="center" sx={{ mt: 2 }}>
+              <Box className="alert alert-error" sx={{ mt: 2, mb: 2 }}>
                 {error}
-              </Typography>
+              </Box>
             )}
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ 
+                mt: 3, 
+                mb: 2,
+                backgroundColor: 'var(--primary-color)',
+                '&:hover': {
+                  backgroundColor: 'var(--primary-dark)',
+                },
+                padding: '0.75rem',
+                textTransform: 'uppercase',
+                fontWeight: 500,
+                borderRadius: '4px'
+              }}
+              className="btn btn-primary"
             >
               Sign In
             </Button>

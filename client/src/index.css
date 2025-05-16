@@ -1,11 +1,25 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Roboto', 'Segoe UI', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --primary-color: #3f51b5;
+  --primary-dark: #303f9f;
+  --primary-light: #7986cb;
+  --secondary-color: #ff4081;
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --error-color: #f44336;
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --background-light: #f5f5f5;
+  --background-paper: #ffffff;
+  --border-color: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+
+  /* Default to light theme */
+  color: var(--text-primary);
+  background-color: var(--background-light);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,56 +27,136 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 a {
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
+
 a:hover {
-  color: #535bf2;
+  color: var(--primary-dark);
+  text-decoration: underline;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--background-light);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  margin-top: 0;
+  font-weight: 500;
 }
 
 h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+  font-size: 2.5rem;
+  line-height: 1.2;
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
-  font-size: 1em;
+  font-size: 1rem;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--primary-color);
+  color: white;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition: all 0.2s ease;
 }
 
-@media (prefers-color-scheme: light) {
+button:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  transition: border-color 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(63, 81, 181, 0.2);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+th {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: 500;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    --text-primary: #f5f5f5;
+    --text-secondary: #b0b0b0;
+    --background-light: #121212;
+    --background-paper: #1e1e1e;
+    --border-color: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.3);
   }
-  a:hover {
-    color: #747bff;
-  }
+
   button {
-    background-color: #f9f9f9;
+    background-color: var(--primary-color);
+  }
+  
+  button:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+  
+  tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
   }
 }
